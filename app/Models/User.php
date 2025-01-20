@@ -22,6 +22,13 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    public function peticione(){
+        return $this->hasMany(Peticione::class);
+    }
+
+    public function firmas(){
+        return $this->belongsToMany(Peticione::class, 'peticione_user');
+    }
 
     /**
      * The attributes that should be hidden for serialization.
