@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace App;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Peticione;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -22,6 +24,15 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
     public function peticione(){
         return $this->hasMany(Peticione::class);
     }

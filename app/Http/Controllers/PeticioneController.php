@@ -12,6 +12,10 @@ use Illuminate\Http\Request;
 
 class PeticioneController extends Controller
 {
+
+    public function __construct(){
+        $this->middleware('auth:api', ['except' => ['index', 'show']]);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -114,6 +118,9 @@ class PeticioneController extends Controller
     {
         try{
             $peticion = Peticione::findOrFail($id);
+            if($request -> user()->cannot('cambiarEstado', $peticion)){
+                return response()->json(['error'=>'No autorizado'], 403);
+            }
             $peticion->estado = 'aceptada';
             $peticion->save();
             return $peticion;
