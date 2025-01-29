@@ -6,7 +6,9 @@ use App\Models\Peticione;
 use App\Models\User;
 use App\Models\categoria;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
 
 
 
@@ -63,6 +65,9 @@ class PeticioneController extends Controller
     {
         try{
             $peticion = Peticione::findOrFail($id);
+            if($request -> user()->cannot('update', Auth::user(), $peticion)){
+                return response()->json(['error'=>'No autorizado'], 403);
+            }
             $peticion->update($request->all());
             return $peticion;
         }catch (\Exception $exception){
@@ -133,6 +138,9 @@ class PeticioneController extends Controller
     {
         try{
             $peticion = Peticione::findOrFail($id);
+            if($request -> user()->cannot('delete',Auth::user(), $peticion)){
+                return response()->json(['error'=>'No autorizado'], 403);
+            }
             $peticion->delete();
             return $peticion;
         }catch (\Exception $exception){
