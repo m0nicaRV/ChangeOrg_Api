@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use App\User;
+use App\Models\User;
 use App\Models\Peticione;
 
 class AuthController extends Controller
@@ -36,14 +36,14 @@ public function login(Request $request){
 // $request‐>validate();
     $credentials = $request->only('email', 'password');
     $token = Auth::attempt($credentials);
-    
+
     if (!$token) {
         return response()->json([
 /*'status' => 'error',
 'message' => 'Unauthorized',*/
     'error' => 'Unauthorized. Either email or password is wrong.',], 401);
     }
-    
+
     $user = Auth::user();
     return response()->json([
     'access_token' => $token,

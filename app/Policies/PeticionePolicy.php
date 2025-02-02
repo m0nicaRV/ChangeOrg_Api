@@ -3,19 +3,19 @@
 namespace App\Policies;
 
 use App\Models\Peticione;
-use App\User;
+use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
 class PeticionePolicy
 {
-     
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
         return true;
-        
+
     }
 
     /**
@@ -45,6 +45,7 @@ class PeticionePolicy
         if ($user->role_id==1 || $user->id==$peticione->user_id) {
             return true;
         }
+        return false;
     }
 
     /**
@@ -52,9 +53,10 @@ class PeticionePolicy
      */
     public function delete(User $user, Peticione $peticione): bool
     {
-        if ($user->role_id==1 || $user->id==$peticione->user_id) {
+        if ($user->role_id==1 || $user->id == $peticione->user_id) {
             return true;
         }
+        return false;
     }
 
     /**
@@ -65,6 +67,7 @@ class PeticionePolicy
         if ($user->role_id==1 || $user->id==$peticione->user_id) {
             return true;
         }
+        return false;
     }
 
     /**
@@ -76,17 +79,17 @@ class PeticionePolicy
         return true;
     }
 
-    public function before(User $user, string $ability): ?bool
+    /*public function before(User $user, string $ability): ?bool
     {
         if ($user->role_id==1) {
             return true;
         }
-
-    }
+        return false;
+    }*/
 
     public function cambiarEstado(User $user, Peticione $peticione): bool
     {
         return false;
     }
-    
+
 }

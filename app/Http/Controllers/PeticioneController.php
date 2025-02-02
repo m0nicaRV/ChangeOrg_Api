@@ -35,10 +35,10 @@ class PeticioneController extends Controller
     public function listMine(){
 
         try{
-             //parent::index()
-            //$user = Auth::user();
-            $id=1;
-            $peticiones= Peticione::all()->where('user_id',$id);
+             parent::index();
+            $user = Auth::user();
+            //$id=1;
+            $peticiones= Peticione::all()->where('user_id',$user->id());
             return $peticiones;
         }catch (\Exception $exception){
             return response()->json(['error'=>$exception->getMessage()]);
@@ -65,7 +65,7 @@ class PeticioneController extends Controller
     {
         try{
             $peticion = Peticione::findOrFail($id);
-            if($request -> user()->cannot('update', Auth::user(), $peticion)){
+            if($request -> user()->cannot('update', $peticion)){
                 return response()->json(['error'=>'No autorizado'], 403);
             }
             $peticion->update($request->all());
@@ -87,7 +87,7 @@ class PeticioneController extends Controller
 
             $input = $request->all();
             $category = Categoria::findOrFail($request->input('categoria_id'));
-            $user = 1;
+            $user = Auth::user();
 
             $peticion = new Peticione($input);
             $peticion->user()->associate($user);
@@ -106,10 +106,11 @@ class PeticioneController extends Controller
     {
         try{
             $peticion = Peticione::findOrFail($id);
-            //$user = Auth::user();
-            $user = 1;
-            $user_id = [$user];
-            //$user_id = [$user‐>id];
+            $user = Auth::user();
+            $user_id = [$user->id];
+            //$user = 1;
+            //$user_id = [$user];
+
             $peticion->firmas()->attach($user_id);
             $peticion->firmantes = $peticion->firmantes + 1;
             $peticion->save();
@@ -138,7 +139,7 @@ class PeticioneController extends Controller
     {
         try{
             $peticion = Peticione::findOrFail($id);
-            if($request -> user()->cannot('delete',Auth::user(), $peticion)){
+            if($request -> user()->cannot('delete', $peticion)){
                 return response()->json(['error'=>'No autorizado'], 403);
             }
             $peticion->delete();
