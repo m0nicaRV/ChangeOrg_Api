@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', [1, 0])->default(0);
+            $table->enum('role_id', [1, 0])->default(0);
             $table->string('file_path')->nullable();
         });
     }
