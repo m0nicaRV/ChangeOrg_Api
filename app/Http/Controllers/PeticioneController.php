@@ -108,6 +108,9 @@ class PeticioneController extends Controller
             $peticion = Peticione::findOrFail($id);
             $user = Auth::user();
             $user_id = [$user->id];
+            if($request->user()->cannot('firmar',$peticion )){
+                return response()->json(['error'=>'Ya has firmado esta peticion'], 403);
+            }
             //$user = 1;
             //$user_id = [$user];
 

@@ -53,12 +53,17 @@ class PeticionePolicy
      */
     public function delete(User $user, Peticione $peticione): bool
     {
-        if ($user->role_id==1 || $user->id == $peticione->user_id) {
+        if (($user->role_id==1 || $user->id == $peticione->user_id) && $peticione->firmantes == 0  ) {
             return true;
         }
         return false;
     }
-
+    public function firmar(User $user, Peticione $peticione): bool
+    {
+        if(!$peticione->firmas()->where('user_id', $user->id)->exists()){
+            return true;
+        }return false;
+    }
     /**
      * Determine whether the user can restore the model.
      */
@@ -89,6 +94,9 @@ class PeticionePolicy
 
     public function cambiarEstado(User $user, Peticione $peticione): bool
     {
+        if($user->role_id==1){
+            return true;
+        }
         return false;
     }
 
