@@ -14,6 +14,10 @@ class Peticione extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+    
+    public  function file(){
+        return $this->hasOne(File::class);
+    }
 
     public function categoria(){
         return $this->belongsTo(Categoria::class);

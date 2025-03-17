@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Peticione;
 use App\Models\User;
 use App\Models\categoria;
+use App\Models\File;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class PeticioneController extends Controller
     public function index()
     {
         try{
-            $peticiones = Peticione::all();
+            $peticiones = Peticione::with('file','user','categoria')->get();
             return $peticiones;
         }catch (\Exception $exception){
            return response()->json(['error'=>$exception->getMessage()]);
@@ -32,13 +33,12 @@ class PeticioneController extends Controller
 
     }
 
-    public function listMine(){
+    public function listmine(){
 
         try{
-             parent::index();
             $user = Auth::user();
             //$id=1;
-            $peticiones= Peticione::all()->where('user_id',$user->id());
+            $peticiones = Peticione::with('file', 'user', 'categoria')->where('user_id', $user->id)->get(); 
             return $peticiones;
         }catch (\Exception $exception){
             return response()->json(['error'=>$exception->getMessage()]);
@@ -50,7 +50,7 @@ class PeticioneController extends Controller
     public function show(Request $request, $id)
     {
         try{
-            $peticion = Peticione::all()->where('user_id',$id);
+            $peticion = Peticione::with('file', 'user', 'categoria')->where('id',$id)->get();
             return $peticion;
         }catch (\Exception $exception){
             return response()->json(['error'=>$exception->getMessage()]);
@@ -83,6 +83,7 @@ class PeticioneController extends Controller
                 'descripcion' => 'required',
                 'destinatario' => 'required',
                 'categoria_id' => 'required',
+                'file'=>'required'
             ]);
 
             $input = $request->all();
@@ -94,13 +95,41 @@ class PeticioneController extends Controller
             $peticion->categoria()->associate($category);
             $peticion->firmantes = 0;
             $peticion->estado = 'pendiente';
-            $peticion->save();
+            $res = $peticion->save();
+
+            if($res){
+                $res_file=$this->fileUpload($request,$peticion->id);
+                if($res_file){
+                    return $peticion;
+                }
+                return back()->withErrors('Error creando peticion')->withInput();
+            }
 
             return $peticion;
         } catch (\Exception $exception) {
             return response()->json(['error' => $exception->getMessage()]);
         }
 
+    }
+
+    public function fileUpload(Request $req, $peticione_id = null){
+        $file = $req->file('file');
+        $fileModel = new File;
+        $fileModel->peticione_id = $peticione_id;
+        if ($req->file('file')) {
+            $filename = $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move('storage/', $filename);
+            $fileModel->name = $filename;
+            $fileModel->file_path = $filename;
+            $res = $fileModel->save();
+            return $fileModel;
+            if ($res) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+        return 1;
     }
     public function firmar(Request $request, $id)
     {
