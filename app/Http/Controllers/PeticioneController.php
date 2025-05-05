@@ -64,17 +64,34 @@ class PeticioneController extends Controller
     public function update(Request $request, $id)
     {
         try{
-            $peticion = Peticione::findOrFail($id);
+            $peticion=Peticione::query()->findOrFail($id);
             if($request -> user()->cannot('update', $peticion)){
                 return response()->json(['error'=>'No autorizado'], 403);
             }
-            $peticion->update($request->all());
-            return $peticion;
+
+            $res=$peticion->update($request->all());
+            if($request->file('file')){
+                $peticion->file()->delete();
+                if($res){
+                    $res_file=$this->fileUpload($request,$peticion->id);
+                    if($res_file){
+                        return $request;
+                    }
+                    return back()->withErrors('Error editando peticion')->withInput();
+                }
+            }
+    
         }catch (\Exception $exception){
             return response()->json(['error'=>$exception->getMessage()]);
         }
+        $hola = $request->all();
+        return $hola;
 
     }
+
+
+ 
+    
     public function store(Request $request)
     {
         try {
